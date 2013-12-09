@@ -5,3 +5,4 @@ obj
 *.swm
 *.swn
 run_experiment
+gen_noiseless

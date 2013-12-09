@@ -4,7 +4,7 @@
 
 CXX = g++
 MEX = mex
-CXXFLAGS = -Wall -Wextra -ggdb -g3 -std=c++11 -pedantic
+CXXFLAGS = -Wall -Wextra -O2 -std=c++11 -pedantic
 
 SRCDIR = src
 DEPDIR = .deps
@@ -18,6 +18,7 @@ clean:
 	rm -rf $(OBJDIR)
 	rm -rf $(DEPDIR)
 	rm -f run_experiment
+	rm -f gen_noiseless
 	rm -f sfft_benchmark.tar.gz
 
 archive:
@@ -27,10 +28,15 @@ archive:
 	rm -rf archive-tmp
 
 RUN_EXPERIMENT_OBJS = run_experiment.o
+GEN_NOISELESS_OBJS = gen_noiseless.o
 
 # run_experiment executable
 run_experiment: $(RUN_EXPERIMENT_OBJS:%=$(OBJDIR)/%)
 	$(CXX) $(CXXFLAGS) -o $@ $^ -lboost_program_options -lfftw3 -lrt
+
+# gen_noiseless executable
+gen_noiseless: $(GEN_NOISELESS_OBJS:%=$(OBJDIR)/%)
+	$(CXX) $(CXXFLAGS) -o $@ $^ -lboost_program_options
 
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.cc

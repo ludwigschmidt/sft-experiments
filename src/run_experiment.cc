@@ -100,11 +100,13 @@ bool ReadInput(const string& src, size_t n, vector<dcomplex>* data) {
       fclose(input);
       return false;
     }
-    if (!feof(input)) {
+    // Check if file is empty
+    uint8_t tmp;
+    if (fread(&tmp, sizeof(uint8_t), 1, input) != 0) {
       fprintf(stderr, "Input not empty afer reading %lu complex numbers.\n", n);
       return false;
     }
-    if (!fclose(input)) {
+    if (fclose(input) != 0) {
       fprintf(stderr, "Could not close input.\n");
     }
   }
@@ -203,6 +205,11 @@ bool WriteOutput(int argc,
   }
   fprintf(out, "  ]\n");
   fprintf(out, "}\n");
+
+  if (fclose(out) != 0) {
+    fprintf(stderr, "Error closing output file stream.");
+    return false;
+  }
 
   return true;
 }
@@ -305,7 +312,7 @@ int main(int argc, char** argv) {
           "Threshold for l0-norm computation.")
       ("n", po::value<size_t>(&n)->default_value(0),
           "Number of elements in the input.")
-      ("num_trials", po::value<size_t>(&num_trials)->default_value(0),
+      ("num_trials", po::value<size_t>(&num_trials)->default_value(1),
           "Number of trials.")
       ("output_file", po::value<string>(&output_file)->default_value(""),
           "Output file name (or \"\" for stdout). The default is \"\".");
