@@ -1,5 +1,11 @@
-// Generates a signal with uniformly random support. Each supported value has a
-// uniformly random phase and absolute value 1.
+// Generates a signal of size n with a Fourier spectrum that satisfies the
+// following properties:
+// - The spectrum is k-sparse.
+// - The spectrum has a uniformly random support (unless it is set to the first
+//   k indices with --firstk).
+// - Each supported value of the spectrum has absolute value 1.
+// - The phase of each supported value is uniformly random, unless
+//   --skip_phase_randomization is passed to the program.
 
 #include <cmath>
 #include <complex>
@@ -10,6 +16,8 @@
 #include <vector>
 
 #include <boost/program_options.hpp>
+
+#include "fftw_helper.h"
 
 namespace po = boost::program_options;
 
@@ -60,14 +68,18 @@ int main(int argc, char** argv) {
 
   po::options_description desc("Allowed options");
   desc.add_options()
+      ("firstk", "Do not randomize spectrum support, take the k first indices.")
       ("help", "Show help message.")
       ("k", po::value<size_t>(&k)->default_value(0), "Sparsity")
       ("n", po::value<size_t>(&n)->default_value(0),
           "Size of the signal to be generated.")
       ("output_file", po::value<string>(&output_file)->default_value(""),
           "Output file name (or \"\" for stdout). The default is \"\".")
+      ("skip_phase_randomization", "Do not randomize the phase.")
       ("seed", po::value<size_t>(&seed)->default_value(0),
-          "Seed for the PRNG.");
+          "Seed for the PRNG.")
+      ("skip_ifft", "Do not apply an inverse FFT on the generated spectrum.")
+      ("skip_normalization", "Do not normalize the output from FFTW.");
   po::variables_map vm;
   po::store(po::parse_command_line(argc, argv, desc), vm);
   po::notify(vm);
@@ -89,17 +101,30 @@ int main(int argc, char** argv) {
   for (size_t ii = 0; ii < n; ++ii) {
     indices[ii] = ii;
   }
-  std::shuffle(indices.begin(), indices.end(), prng);
+  if (!vm.count("firstk")) {
+    std::shuffle(indices.begin(), indices.end(), prng);
+  }
 
-  // Signal
+  // Spectrum
   vector<dcomplex> signal(n, dcomplex(0, 0));
 
   std::uniform_real_distribution<> phase_distribution(0, 2 * M_PI);
   for (size_t ii = 0; ii < k; ++ii) {
     size_t pos = indices[ii];
-    double phase = phase_distribution(prng);
-    signal[pos].real(std::cos(phase));
-    signal[pos].imag(std::sin(phase));
+    if (vm.count("skip_phase_randomization")) {
+      signal[pos].real(1.0);
+      signal[pos].imag(0.0);
+    } else {
+      double phase = phase_distribution(prng);
+      signal[pos].real(std::cos(phase));
+      signal[pos].imag(std::sin(phase));
+    }
+  }
+
+  if (!vm.count("skip_ifft")) {
+    double tmp;
+    ApplyFFTW(signal, !vm.count("skip_normalization"), false, false, &tmp,
+        &signal);
   }
 
   if (!WriteOutput(signal, output_file)) {

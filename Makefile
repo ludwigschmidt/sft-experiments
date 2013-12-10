@@ -4,13 +4,15 @@
 
 CXX = g++
 MEX = mex
-CXXFLAGS = -Wall -Wextra -O2 -std=c++11 -pedantic
+#CXXFLAGS = -Wall -Wextra -ggdb3 -std=c++11 -pedantic -I../sfft_libs -L../sfft_libs/sfft_eth
+#CXXFLAGS = -Wall -Wextra -g -std=c++11 -pedantic -I../sfft_libs -L../sfft_libs/sfft_eth -fsanitize=address -fno-omit-frame-pointer
+CXXFLAGS = -Wall -Wextra -O3 -std=c++11 -pedantic -I../sfft_libs -L../sfft_libs/sfft_eth
 
 SRCDIR = src
 DEPDIR = .deps
 OBJDIR = obj
 
-SRCS = run_experiment.cc
+SRCS = run_experiment.cc gen_noiseless.cc sfft_eth_interface.cc
 
 .PHONY: clean archive
 
@@ -27,16 +29,16 @@ archive:
 	mv archive-tmp/sfft_benchmark.tar.gz .
 	rm -rf archive-tmp
 
-RUN_EXPERIMENT_OBJS = run_experiment.o
+RUN_EXPERIMENT_OBJS = run_experiment.o sfft_eth_interface.o
 GEN_NOISELESS_OBJS = gen_noiseless.o
 
 # run_experiment executable
 run_experiment: $(RUN_EXPERIMENT_OBJS:%=$(OBJDIR)/%)
-	$(CXX) $(CXXFLAGS) -o $@ $^ -lboost_program_options -lfftw3 -lrt
+	$(CXX) $(CXXFLAGS) -o $@ $^ -lboost_program_options -lfftw3 -lm -lrt -lgomp -lsfft_eth -lippvm -lipps -pthread
 
 # gen_noiseless executable
 gen_noiseless: $(GEN_NOISELESS_OBJS:%=$(OBJDIR)/%)
-	$(CXX) $(CXXFLAGS) -o $@ $^ -lboost_program_options
+	$(CXX) $(CXXFLAGS) -o $@ $^ -lboost_program_options -lfftw3
 
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.cc

@@ -6,15 +6,14 @@
 #include <memory>
 #include <sstream>
 #include <string>
-#include <vector>
 
 #include <boost/algorithm/string.hpp>
 #include <boost/program_options.hpp>
-#include <fftw3.h>
 
 #include "fft_interface.h"
+#include "fftw_helper.h"
 #include "fftw_interface.h"
-#include "timer.h"
+#include "sfft_eth_interface.h"
 
 namespace po = boost::program_options;
 
@@ -113,40 +112,6 @@ bool ReadInput(const string& src, size_t n, vector<dcomplex>* data) {
   return true;
 }
 
-bool ComputeReferenceOutput(const vector<dcomplex>& input,
-                            double* reference_time,
-                            vector<dcomplex>* output) {
-  fftw_complex* data = fftw_alloc_complex(input.size());
-  if (data == nullptr) {
-    return false;
-  }
-
-  fftw_plan plan = fftw_plan_dft_1d(input.size(), data, data, FFTW_FORWARD,
-                                    FFTW_ESTIMATE);
-  if (plan == nullptr) {
-    fftw_free(data);
-    return false;
-  }
-
-  memcpy(data, input.data(), sizeof(fftw_complex) * input.size());
-
-  Timer timer; 
-  fftw_execute(plan);
-  *reference_time = timer.GetElapsedSeconds();
-
-  output->resize(input.size());
-  memcpy(output->data(), data, sizeof(fftw_complex) * input.size());
-  double normalization_factor = 1.0 / sqrt(input.size());
-  for (size_t ii = 0; ii < input.size(); ++ii) {
-    (*output)[ii] *= normalization_factor;
-  }
-
-  fftw_destroy_plan(plan);
-  fftw_free(data);
-
-  return true;  
-}
-
 bool WriteOutput(int argc,
                  char** argv,
                  const vector<dcomplex>& input,
@@ -236,15 +201,14 @@ class FFT {
     return true;
   }
 
-  FFT(size_t n, size_t k, const vector<dcomplex>& input, Type type) : n_(n),
-      k_(k), input_(input), type_(type) { };
+  FFT(size_t n, size_t k, Type type) : n_(n), k_(k), type_(type) { };
 
   bool Setup() {
     if (type_ == Type::FFTW) {
-      fft_.reset(new FFTWInterface(input_, true));
-    } else {
-      fprintf(stderr, "Unknown FFT type.\n");
-      return false;
+      fft_.reset(new FFTWInterface(n_, true));
+    } else if (type_ == Type::SFFT3_ETH) {
+      fft_.reset(new SFFTETHInterface(n_, k_, SFFTETHInterface::Version::SFFT_3,
+                                      false));
     }
     
     if (!fft_->Setup()) {
@@ -255,17 +219,24 @@ class FFT {
     return true;
   }
 
-  bool RunTrial(vector<dcomplex>* output, double* time) {
-    if (!fft_->RunTrial(output, time)) {
+  bool RunTrial(const vector<dcomplex>& input,
+                vector<dcomplex>* output,
+                double* time) {
+    if (input.size() != n_) {
+      fprintf(stderr, "Error, input size does not match n_: %lu vs %lu\n",
+              input.size(), n_);
+      return false;
+    }
+    if (!fft_->RunTrial(input, output, time)) {
       fprintf(stderr, "Error while running internal FFT implementation.");
       return false;
     }
-    if (output->size() != input_.size()) {
+    if (output->size() != input.size()) {
       fprintf(stderr, "Dimension of output produced by the interal FFT "
                       "implementation does not match the input dimension: "
                       "%lu vs %lu (output vs input).",
                       output->size(),
-                      input_.size());
+                      input.size());
       return false;
     }
     return true;
@@ -274,7 +245,6 @@ class FFT {
  private:
   size_t n_;
   size_t k_;
-  const vector<dcomplex>& input_;
   Type type_;
   unique_ptr<FFTInterface> fft_;
 };
@@ -335,30 +305,31 @@ int main(int argc, char** argv) {
   vector<dcomplex> reference_output;
 
   if (!ReadInput(input_file, n, &input_data)) {
-    fprintf(stderr, "Could not read input.");
+    fprintf(stderr, "Could not read input.\n");
     return 1;
   }
 
-  if (!ComputeReferenceOutput(input_data, &reference_time, &reference_output)) {
-    fprintf(stderr, "Could not compute reference output.");
+  if (!ApplyFFTW(input_data, true, true, false, &reference_time,
+                 &reference_output)) {
+    fprintf(stderr, "Could not compute reference output.\n");
     return 1;
   }
 
-  FFT fft(n, k, input_data, fft_type);
+  FFT fft(n, k, fft_type);
 
   if (!fft.Setup()) {
-    fprintf(stderr, "Could not set up algorithm."); 
+    fprintf(stderr, "Could not set up algorithm.\n"); 
     return 1;
   }
 
   // Warm-up run
   RunResult current_result;
   vector<dcomplex> output;
-  fft.RunTrial(&output, &current_result.time);
+  fft.RunTrial(input_data, &output, &current_result.time);
 
   vector<RunResult> results;
   for (size_t ii = 0; ii < num_trials; ++ii) {
-    fft.RunTrial(&output, &current_result.time);
+    fft.RunTrial(input_data, &output, &current_result.time);
     ComputeErrorStatistics(output, reference_output, l0_epsilon,
         &current_result);
     results.push_back(current_result);

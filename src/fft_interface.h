@@ -7,7 +7,8 @@
 class FFTInterface {
  public:
   virtual bool Setup() = 0;
-  virtual bool RunTrial(std::vector<std::complex<double>>* output,
+  virtual bool RunTrial(const std::vector<std::complex<double> >& input,
+                        std::vector<std::complex<double> >* output,
                         double* running_time) = 0;
   virtual ~FFTInterface() {}
 };

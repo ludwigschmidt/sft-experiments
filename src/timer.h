@@ -12,10 +12,10 @@ class Timer {
     return (clock_gettime(CLOCK_MONOTONIC_RAW, &ts) == 0);
   }
 
-  static uint64_t GetNanosecondTimestamp() {
+  static uint_fast64_t GetNanosecondTimestamp() {
     timespec ts;
     clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
-    uint64_t rv;
+    uint_fast64_t rv;
     rv = ts.tv_sec;
     rv *= 1000000000;
     rv += ts.tv_nsec;
@@ -27,12 +27,12 @@ class Timer {
   }
 
   double GetElapsedSeconds() {
-    uint64_t current = GetNanosecondTimestamp();
+    uint_fast64_t current = GetNanosecondTimestamp();
     return static_cast<double>(current - start) * 1e-9;
   }
 
  private:
-  uint64_t start;
+  uint_fast64_t start;
 };
 
 #endif
