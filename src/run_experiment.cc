@@ -144,29 +144,38 @@ bool WriteOutput(int argc,
 
   SignalStatistics input_stats;
   ComputeSignalStatistics(input, l0_epsilon, &input_stats);
-  fprintf(out, "  \"input_l0\": %lu,\n", input_stats.l0);
-  fprintf(out, "  \"input_l1\": %e,\n", input_stats.l1);
-  fprintf(out, "  \"input_l2\": %e,\n", input_stats.l2);
-  fprintf(out, "  \"input_linf\": %e,\n", input_stats.linf);
+  fprintf(out, "  \"input_stats\": {\n");
+  fprintf(out, "    \"l0\": %lu,\n", input_stats.l0);
+  fprintf(out, "    \"l1\": %e,\n", input_stats.l1);
+  fprintf(out, "    \"l2\": %e,\n", input_stats.l2);
+  fprintf(out, "    \"linf\": %e\n", input_stats.linf);
+  fprintf(out, "  },\n");
 
   fprintf(out, "  \"reference_time\": %e,\n", reference_time);
   SignalStatistics ref_output_stats;
   ComputeSignalStatistics(reference_output, l0_epsilon, &ref_output_stats);
-  fprintf(out, "  \"reference_output_l0\": %lu,\n", ref_output_stats.l0);
-  fprintf(out, "  \"reference_output_l1\": %e,\n", ref_output_stats.l1);
-  fprintf(out, "  \"reference_output_l2\": %e,\n", ref_output_stats.l2);
-  fprintf(out, "  \"reference_output_linf\": %e,\n", ref_output_stats.linf);
+  fprintf(out, "  \"reference_output_stats\": {\n");
+  fprintf(out, "    \"l0\": %lu,\n", ref_output_stats.l0);
+  fprintf(out, "    \"l1\": %e,\n", ref_output_stats.l1);
+  fprintf(out, "    \"l2\": %e,\n", ref_output_stats.l2);
+  fprintf(out, "    \"linf\": %e\n", ref_output_stats.linf);
+  fprintf(out, "  },\n");
 
   fprintf(out, "  \"results\": [\n");
   for (size_t ii = 0; ii < results.size(); ++ii) {
     fprintf(out, "    {\n");
     fprintf(out, "      \"running_time\": %e,\n", results[ii].time);
-    fprintf(out, "      \"error_l0\": %lu,\n", results[ii].error_statistics.l0);
-    fprintf(out, "      \"error_l1\": %e,\n", results[ii].error_statistics.l1);
-    fprintf(out, "      \"error_l2\": %e,\n", results[ii].error_statistics.l2);
-    fprintf(out, "      \"error_linf\": %e,\n",
-        results[ii].error_statistics.linf);
-    fprintf(out, "    }\n");
+    fprintf(out, "      \"error_stats\": {\n");
+    fprintf(out, "        \"l0\": %lu,\n", results[ii].error_statistics.l0);
+    fprintf(out, "        \"l1\": %e,\n", results[ii].error_statistics.l1);
+    fprintf(out, "        \"l2\": %e,\n", results[ii].error_statistics.l2);
+    fprintf(out, "        \"linf\": %e\n", results[ii].error_statistics.linf);
+    fprintf(out, "      }\n");
+    if (ii != results.size() - 1) {
+      fprintf(out, "    },\n");
+    } else {
+      fprintf(out, "    }\n");
+    }
   }
   fprintf(out, "  ]\n");
   fprintf(out, "}\n");
