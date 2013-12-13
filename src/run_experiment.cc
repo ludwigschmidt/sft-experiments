@@ -14,6 +14,7 @@
 #include "fftw_helper.h"
 #include "fftw_interface.h"
 #include "sfft_eth_interface.h"
+#include "sfft_mit_interface.h"
 
 namespace po = boost::program_options;
 
@@ -192,7 +193,7 @@ class FFT {
  public:
   enum class Type {
       FFTW,
-      SFFT3,
+      SFFT2_MIT,
       SFFT3_ETH,
   };
 
@@ -200,8 +201,8 @@ class FFT {
     string lower = boost::algorithm::to_lower_copy(str);
     if (lower == "fftw") {
       *type = Type::FFTW;
-    } else if (lower == "sfft3") {
-      *type = Type::SFFT3;
+    } else if (lower == "sfft2-mit") {
+      *type = Type::SFFT2_MIT;
     } else if (lower == "sfft3-eth") {
       *type = Type::SFFT3_ETH;
     } else {
@@ -215,13 +216,18 @@ class FFT {
   bool Setup() {
     if (type_ == Type::FFTW) {
       fft_.reset(new FFTWInterface(n_, true));
+    } else if (type_ == Type::SFFT2_MIT) {
+      fft_.reset(new SFFTMITInterface(n_, k_));
     } else if (type_ == Type::SFFT3_ETH) {
       fft_.reset(new SFFTETHInterface(n_, k_, SFFTETHInterface::Version::SFFT_3,
                                       false));
+    } else {
+      fprintf(stderr, "Unknown FFT type.\n");
+      return false;
     }
     
     if (!fft_->Setup()) {
-      fprintf(stderr, "Error setting up internal FFT implementation.");
+      fprintf(stderr, "Error setting up internal FFT implementation.\n");
       return false;
     }
 
