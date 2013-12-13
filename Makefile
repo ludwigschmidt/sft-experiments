@@ -5,7 +5,7 @@
 CXX = g++
 MEX = mex
 #CXXFLAGS = -Wall -Wextra -ggdb3 -std=c++11 -pedantic -I../sfft_libs -L../sfft_libs/sfft_eth
-#CXXFLAGS = -Wall -Wextra -g -std=c++11 -pedantic -I../sfft_libs -L../sfft_libs/sfft_eth -fsanitize=address -fno-omit-frame-pointer
+#CXXFLAGS = -Wall -Wextra -ggdb3 -std=c++11 -pedantic -I../sfft_libs -L../sfft_libs/sfft_eth -fsanitize=address -fno-omit-frame-pointer
 CXXFLAGS = -Wall -Wextra -O3 -std=c++11 -pedantic -I../sfft_libs -L../sfft_libs/sfft_eth
 
 SRCDIR = src

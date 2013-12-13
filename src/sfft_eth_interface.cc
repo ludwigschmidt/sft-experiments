@@ -1,5 +1,6 @@
 #include "sfft_eth_interface.h"
 
+#include <cstdio>
 #include <cstring>
 
 #include "timer.h"
