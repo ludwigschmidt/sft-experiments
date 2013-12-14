@@ -11,13 +11,11 @@
 
 #include "timer.h"
 
-bool SFFTMITInterface::Setup() {
+bool SFFTMITInterface::InternalSetup() {
   input_ = (complex_t*) malloc(sizeof(complex_t) * n_);
   if (input_ == nullptr) {
     return false;
   }
-
-  // TODO: setup filters and get parameters
 
   double Bcst_loc = 1.0;
   double Bcst_est = 1.0;
@@ -28,6 +26,8 @@ bool SFFTMITInterface::Setup() {
   Comb_loops_ = 1;
   double tolerance_loc = 1.0e-8;
   double tolerance_est = 1.0e-8;
+
+  loops_loc_ = -1;
 
   if (k_ == 50) {
     get_expermient_vs_N_parameters(n_, true, Bcst_loc, Bcst_est, Comb_cst,
@@ -41,6 +41,11 @@ bool SFFTMITInterface::Setup() {
     fprintf(stderr, "Set of parameters n, k for which SFFT_MIT parameters are "
                     "not known.\n");
     return false;
+  }
+
+  if (loops_loc_ == -1) {
+    fprintf(stderr, "Set of parameters n, k for which SFFT_MIT parameters are "
+        "not known.\n");
   }
 
   real_t BB_loc = (unsigned) (Bcst_loc * sqrt((double) n_ * k_ / log2(n_)));
@@ -72,6 +77,10 @@ bool SFFTMITInterface::Setup() {
   return true;
 }
 
+bool SFFTMITInterface::Setup() {
+  return InternalSetup();
+}
+
 bool SFFTMITInterface::RunTrial(const std::vector<std::complex<double>>& input,
                                 std::vector<std::complex<double>>* output,
                                 double* running_time) {
@@ -87,6 +96,19 @@ bool SFFTMITInterface::RunTrial(const std::vector<std::complex<double>>& input,
 
   output_.clear();
 
+  /*printf("\nn = %lu  B_est_ = %d  B_thresh_ = %d  B_loc_ = %d  W_Comb_ = %d  "
+         "Comb_loops_ = %d  loops_thresh_ = %d  loops_loc_ = %d  "
+         "loops_loc_ + loops_est_ = %d\n\n", n_, B_est_, B_thresh_, B_loc_,
+         W_Comb_, Comb_loops_, loops_thresh_, loops_loc_,
+         loops_loc_ + loops_est_);
+  printf("filter_: sizet = %d  time[10] = (%lf,%lf)  freq[10] = (%lf,%lf)\n",
+      filter_.sizet, creal(filter_.time[10]), cimag(filter_.time[10]),
+      creal(filter_.freq[10]), creal(filter_.freq[10]));
+  printf("filter_est_: sizet = %d  time[10] = (%lf,%lf)  freq[10] = (%lf,%lf)"
+      "\n", filter_est_.sizet, creal(filter_est_.time[10]),
+      cimag(filter_est_.time[10]), creal(filter_est_.freq[10]),
+      creal(filter_est_.freq[10]));*/
+
   Timer timer; 
   output_ = outer_loop(input_, n_, filter_, filter_est_, B_est_, B_thresh_,
       B_loc_, W_Comb_, Comb_loops_, loops_thresh_, loops_loc_,
@@ -94,14 +116,20 @@ bool SFFTMITInterface::RunTrial(const std::vector<std::complex<double>>& input,
   *running_time = timer.GetElapsedSeconds();
 
   output->resize(n_);
+  output->assign(n_, std::complex<double>(0.0, 0.0));
   for (auto kv : output_) {
     (*output)[kv.first].real(creal(kv.second));
     (*output)[kv.first].imag(cimag(kv.second));
   }
+  
   return true;
 }
 
 SFFTMITInterface::~SFFTMITInterface() {
+  InternalTearDown();
+}
+
+void SFFTMITInterface::InternalTearDown() {
   if (input_ != nullptr) {
     free(input_);
   }

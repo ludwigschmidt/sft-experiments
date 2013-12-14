@@ -193,6 +193,7 @@ class FFT {
  public:
   enum class Type {
       FFTW,
+      SFFT2_ETH,
       SFFT2_MIT,
       SFFT3_ETH,
   };
@@ -201,6 +202,8 @@ class FFT {
     string lower = boost::algorithm::to_lower_copy(str);
     if (lower == "fftw") {
       *type = Type::FFTW;
+    } else if (lower == "sfft2-eth") {
+      *type = Type::SFFT2_ETH;
     } else if (lower == "sfft2-mit") {
       *type = Type::SFFT2_MIT;
     } else if (lower == "sfft3-eth") {
@@ -216,6 +219,9 @@ class FFT {
   bool Setup() {
     if (type_ == Type::FFTW) {
       fft_.reset(new FFTWInterface(n_, true));
+    } else if (type_ == Type::SFFT2_ETH) {
+      fft_.reset(new SFFTETHInterface(n_, k_, SFFTETHInterface::Version::SFFT_2,
+                                      false));
     } else if (type_ == Type::SFFT2_MIT) {
       fft_.reset(new SFFTMITInterface(n_, k_));
     } else if (type_ == Type::SFFT3_ETH) {

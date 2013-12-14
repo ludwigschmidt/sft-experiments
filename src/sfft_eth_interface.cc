@@ -57,6 +57,7 @@ bool SFFTETHInterface::RunTrial(const std::vector<std::complex<double>>& input,
   *running_time = timer.GetElapsedSeconds();
 
   output->resize(n_);
+  output->assign(n_, std::complex<double>(0.0, 0.0));
   for (auto kv : output_) {
     (*output)[kv.first].real(creal(kv.second));
     (*output)[kv.first].imag(cimag(kv.second));

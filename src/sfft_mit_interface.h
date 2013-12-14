@@ -36,6 +36,10 @@ class SFFTMITInterface : public FFTInterface {
   int loops_est_;
   Filter filter_;
   Filter filter_est_;
+
+  bool InternalSetup();
+
+  void InternalTearDown();
 };
 
 #endif
