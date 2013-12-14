@@ -10,6 +10,7 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/program_options.hpp>
 
+#include "aafft_interface.h"
 #include "fft_interface.h"
 #include "fftw_helper.h"
 #include "fftw_interface.h"
@@ -192,6 +193,7 @@ bool WriteOutput(int argc,
 class FFT {
  public:
   enum class Type {
+      AAFFT,
       FFTW,
       SFFT2_ETH,
       SFFT2_MIT,
@@ -200,7 +202,9 @@ class FFT {
 
   static bool ParseType(const string& str, Type* type) {
     string lower = boost::algorithm::to_lower_copy(str);
-    if (lower == "fftw") {
+    if (lower == "aafft") {
+      *type = Type::AAFFT;
+    } else if (lower == "fftw") {
       *type = Type::FFTW;
     } else if (lower == "sfft2-eth") {
       *type = Type::SFFT2_ETH;
@@ -217,7 +221,9 @@ class FFT {
   FFT(size_t n, size_t k, Type type) : n_(n), k_(k), type_(type) { };
 
   bool Setup() {
-    if (type_ == Type::FFTW) {
+    if (type_ == Type::AAFFT) {
+      fft_.reset(new AAFFTInterface(n_, k_));
+    } else if (type_ == Type::FFTW) {
       fft_.reset(new FFTWInterface(n_, true));
     } else if (type_ == Type::SFFT2_ETH) {
       fft_.reset(new SFFTETHInterface(n_, k_, SFFTETHInterface::Version::SFFT_2,
