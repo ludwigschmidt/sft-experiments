@@ -17,6 +17,8 @@ bool SFFTMITInterface::InternalSetup() {
     return false;
   }
 
+  sfft_mit::TIMING = false;
+
   double Bcst_loc = 1.0;
   double Bcst_est = 1.0;
   double Comb_cst = 2.0;
