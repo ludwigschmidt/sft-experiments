@@ -63,33 +63,18 @@ bool AAFFTInterface::InternalSetup() {
   input_.resize(n_);
 
   // Setup parameters
-  params_.set_Signal_Size(n_);
 
-  // important
-  params_.set_Num_FreqID_CoefEst_Iterations(5);
+  // Parameters that are common across all use cases
+  
+  // Signal size
+  params_.set_Signal_Size(n_);
 
   // Working_Rep is generally set to Num_Rep, which is k_
   params_.set_Num_Rep_Terms(k_);
   params_.set_Working_Rep_Terms(k_);
 
-  // important
-  params_.set_Max_KShattering_Sample_Points(128);
-  params_.set_Num_KShattering_Sample_Points(128);
-
   // always 0 if n_ is a power of 2
   params_.set_Exhaustive_Most_Sig_Bits(0);
-
-  // important
-  params_.set_Max_FCE_Sample_Points(128);
-  params_.set_Num_FCE_Sample_Points(128);
-
-  // important
-  params_.set_Norm_Estimation_Max(5);
-  params_.set_Norm_Estimation_Num(5);
-
-  // important
-  params_.set_Max_FCE_Medians(5);
-  params_.set_Num_FCE_Medians(5);
 
   // always 8
   params_.set_Roots_Coef(8);
@@ -101,16 +86,50 @@ bool AAFFTInterface::InternalSetup() {
   params_.set_Naive_Coef_Est_Cutoff(1);
 
   // documentation says 10 is sufficient most of the time. example uses 7.
-  params_.set_Num_Fast_Bulk_Samp_Taylor_Terms(10);
+  params_.set_Num_Fast_Bulk_Samp_Taylor_Terms(7);
 
   // always 8
   params_.set_FFCE_Roots_Coef(8);
 
   // documentation says 10 is sufficient most of the time. example uses 7.
-  params_.set_Num_Fast_Freq_Coefnt_Est_Taylor_Terms(10);
+  params_.set_Num_Fast_Freq_Coefnt_Est_Taylor_Terms(7);
 
-  // important
-  params_.set_FFCE_Iterations(6);
+
+  // Paramters for fixed sparsity (50)
+  // Currently we use the parameters from Haitham
+  if (k_ == 50) {
+    // important
+    // Haitham: -I
+    params_.set_Num_FreqID_CoefEst_Iterations(5);
+
+    // important
+    // Haitham: -S
+    params_.set_Max_KShattering_Sample_Points(128);
+    params_.set_Num_KShattering_Sample_Points(128);
+
+    // important
+    // Haitham: -S
+    params_.set_Max_FCE_Sample_Points(128);
+    params_.set_Num_FCE_Sample_Points(128);
+
+    // important
+    // Haitham: -M
+    params_.set_Norm_Estimation_Max(5);
+    params_.set_Norm_Estimation_Num(5);
+
+    // important
+    // Haitham: -M
+    params_.set_Max_FCE_Medians(5);
+    params_.set_Num_FCE_Medians(5);
+
+    // important
+    // Haitham: -E
+    params_.set_FFCE_Iterations(5);
+  } else {
+    // TODO
+    fprintf(stderr, "Unsupported parameter settings.\n");
+    return false;
+  }
 
   return true;
 }
