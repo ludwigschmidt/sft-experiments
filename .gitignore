@@ -7,4 +7,4 @@ tmpdir
 *.swn
 *.pyc
 run_experiment
-gen_noiseless
+gen_input

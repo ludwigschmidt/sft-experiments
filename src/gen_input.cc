@@ -1,12 +1,3 @@
-// Generates a signal of size n with a Fourier spectrum that satisfies the
-// following properties:
-// - The spectrum is k-sparse.
-// - The spectrum has a uniformly random support (unless it is set to the first
-//   k indices with --firstk).
-// - Each supported value of the spectrum has absolute value 1.
-// - The phase of each supported value is uniformly random, unless
-//   --skip_phase_randomization is passed to the program.
-
 #include <cmath>
 #include <complex>
 #include <cstdint>
@@ -65,6 +56,7 @@ int main(int argc, char** argv) {
   size_t n;
   string output_file;
   uint_fast32_t seed;
+  double noise_variance;
 
   po::options_description desc("Allowed options");
   desc.add_options()
@@ -73,6 +65,11 @@ int main(int argc, char** argv) {
       ("k", po::value<size_t>(&k)->default_value(0), "Sparsity")
       ("n", po::value<size_t>(&n)->default_value(0),
           "Size of the signal to be generated.")
+      ("noise_variance",
+          po::value<double>(&noise_variance)->default_value(1.0 / sqrt(2)),
+          "If this flag is passed into the program, white Gaussian noise is "
+          "added to each component of the signal. The parameter specifies the "
+          "variance for both the real and imaginary component.")
       ("output_file", po::value<string>(&output_file)->default_value(""),
           "Output file name (or \"\" for stdout). The default is \"\".")
       ("skip_phase_randomization", "Do not randomize the phase.")
@@ -109,6 +106,7 @@ int main(int argc, char** argv) {
   vector<dcomplex> signal(n, dcomplex(0, 0));
 
   std::uniform_real_distribution<> phase_distribution(0, 2 * M_PI);
+  std::normal_distribution<> noise_distribution(0, noise_variance);
   for (size_t ii = 0; ii < k; ++ii) {
     size_t pos = indices[ii];
     if (vm.count("skip_phase_randomization")) {
@@ -118,6 +116,13 @@ int main(int argc, char** argv) {
       double phase = phase_distribution(prng);
       signal[pos].real(std::cos(phase));
       signal[pos].imag(std::sin(phase));
+    }
+  }
+
+  if (vm.count("noise_variance")) {
+    for (size_t ii = 0; ii < n; ++ii) {
+      dcomplex noise(noise_distribution(prng), noise_distribution(prng));
+      signal[ii] += noise;
     }
   }
 

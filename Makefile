@@ -12,7 +12,7 @@ SRCDIR = src
 DEPDIR = .deps
 OBJDIR = obj
 
-SRCS = run_experiment.cc gen_noiseless.cc sfft_eth_interface.cc sfft_mit_interface.cc output_writer.cc result_helpers.cc fft_wrapper.cc
+SRCS = run_experiment.cc gen_input.cc sfft_eth_interface.cc sfft_mit_interface.cc output_writer.cc result_helpers.cc fft_wrapper.cc
 
 .PHONY: clean archive
 
@@ -20,7 +20,7 @@ clean:
 	rm -rf $(OBJDIR)
 	rm -rf $(DEPDIR)
 	rm -f run_experiment
-	rm -f gen_noiseless
+	rm -f gen_input
 	rm -f sfft_benchmark.tar.gz
 
 archive:
@@ -30,14 +30,14 @@ archive:
 	rm -rf archive-tmp
 
 RUN_EXPERIMENT_OBJS = run_experiment.o sfft_eth_interface.o sfft_mit_interface.o output_writer.o result_helpers.o fft_wrapper.o
-GEN_NOISELESS_OBJS = gen_noiseless.o
+GEN_INPUT_OBJS = gen_input.o
 
 # run_experiment executable
 run_experiment: $(RUN_EXPERIMENT_OBJS:%=$(OBJDIR)/%)
 	$(CXX) $(CXXFLAGS) -o $@ $^ -lboost_program_options -lfftw3 -lm -lrt -lgomp -lsfft_eth -lsfft_mit -lippvm -lipps -pthread
 
-# gen_noiseless executable
-gen_noiseless: $(GEN_NOISELESS_OBJS:%=$(OBJDIR)/%)
+# gen_input executable
+gen_input: $(GEN_INPUT_OBJS:%=$(OBJDIR)/%)
 	$(CXX) $(CXXFLAGS) -o $@ $^ -lboost_program_options -lfftw3
 
 
