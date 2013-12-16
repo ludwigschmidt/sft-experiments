@@ -30,17 +30,17 @@ def plot_data_filename(basedir, algo):
                       'plot_results_{}.txt'.format(algo))
 
 tmpdir = 'tmpdir2'
-num_instances = 2
+num_instances = 10
 num_trials = 10
-exp1 = 16
-exp2 = 18
+exp1 = 14
+exp2 = 22
 k = 50
 l0_eps = 0.2
 percentile_interval = 95
 random.seed(2314082)
 
-#algs = ['fftw', 'sfft3-eth', 'sfft2-eth', 'sfft2-mit']
-algs = ['sfft3-eth', 'sfft2-eth']
+algs = ['fftw', 'sfft3-eth', 'sfft2-eth', 'sfft2-mit', 'aafft']
+#algs = ['sfft3-eth', 'sfft2-eth']
 results = {}
 for alg in algs:
   results[alg] = {}
@@ -93,9 +93,9 @@ for alg in algs:
   data = results[alg]
   xvals = sorted(data.keys())
   yvals = [data[x].average for x in xvals]
-  yerr_lower = [data[x].percentile_low for x in xvals]
-  yerr_upper = [data[x].percentile_high for x in xvals]
-  plt.errorbar(xvals, yvals, yerr=[yerr_lower, yerr_upper], fmt='-x',
+  yerr_minus = [data[x].average - data[x].percentile_low for x in xvals]
+  yerr_plus = [data[x].percentile_high - data[x].average for x in xvals]
+  plt.errorbar(xvals, yvals, yerr=[yerr_minus, yerr_plus], fmt='-x',
       label=alg)
 plt.loglog(basex=2)
 plt.xlabel('n')

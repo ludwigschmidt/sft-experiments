@@ -15,11 +15,19 @@
     y explicit,
     /pgfplots/.cd,
     line width=1.5pt,
-    mark size=2pt,
+    mark size=3pt,
   },
-  cycle list={{red,mark=o},{blue,mark=square},{green,mark=x},{magenta,mark=diamond}}
+  cycle list={{red,mark=o},{blue,mark=square},{green,mark=x},{magenta,mark=diamond},{cyan,mark=star}}
 }}
 \begin{loglogaxis}[resultplot]
+\addplot+ table [x=n, y=time, y error plus=time_plus, y error minus=time_minus] {plot_results_aafft.txt};
+\addlegendentry{AAFFT}
+
+\addplot+ table [x=n, y=time, y error plus=time_plus, y error minus=time_minus] {plot_results_fftw.txt};
+\addlegendentry{FFTW}
+
+\addplot+ table [x=n, y=time, y error plus=time_plus, y error minus=time_minus] {plot_results_sfft2-mit.txt};
+\addlegendentry{SFFT2-MIT}
 
 \addplot+ table [x=n, y=time, y error plus=time_plus, y error minus=time_minus] {plot_results_sfft2-eth.txt};
 \addlegendentry{SFFT2-ETH}
