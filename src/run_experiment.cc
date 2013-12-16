@@ -186,7 +186,9 @@ int main(int argc, char** argv) {
     for (size_t ii = 0; ii < num_trials; ++ii) {
       fft.RunTrial(input_data, &output, &current_result.time);
       ComputeErrorStatistics(output, reference_output, l0_epsilon,
-          &current_result);
+          &(current_result.error_statistics));
+      ComputeSignalStatistics(output, l0_epsilon,
+                              &(current_result.output_statistics));
       results.push_back(current_result);
     }
 

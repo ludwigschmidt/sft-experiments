@@ -24,10 +24,10 @@ void ComputeSignalStatistics(const std::vector<std::complex<double>>& signal,
 
 void ComputeErrorStatistics(const std::vector<std::complex<double>>& output,
     const std::vector<std::complex<double>>& reference_output,
-    double l0_epsilon, RunResult* result) {
+    double l0_epsilon, SignalStatistics* stats) {
   std::vector<std::complex<double>> error(output.size());
   for (size_t ii = 0; ii < output.size(); ++ii) {
     error[ii] = reference_output[ii] - output[ii];
   }
-  ComputeSignalStatistics(error, l0_epsilon, &(result->error_statistics));
+  ComputeSignalStatistics(error, l0_epsilon, stats);
 }

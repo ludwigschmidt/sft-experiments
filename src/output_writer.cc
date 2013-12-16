@@ -107,6 +107,9 @@ bool OutputWriter::WriteInputResult(const string& input_name,
          << "," << endl;
     oref << "          \"error_stats\": {" << endl;
     WriteSignalStatistics(results[ii].error_statistics, 12);
+    oref << "          }," << endl;
+    oref << "          \"output_stats\": {" << endl;
+    WriteSignalStatistics(results[ii].output_statistics, 12);
     oref << "          }" << endl;
     oref << "        }" << (ii != results.size() - 1 ? "," : "") << endl;
   }
