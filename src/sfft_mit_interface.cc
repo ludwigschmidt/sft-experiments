@@ -18,6 +18,9 @@ bool SFFTMITInterface::InternalSetup() {
   }
 
   sfft_mit::TIMING = false;
+  sfft_mit::VERBOSE = false;
+  sfft_mit::ALGORITHM1 = true;
+  sfft_mit::WITH_COMB = true;
 
   double Bcst_loc = 1.0;
   double Bcst_est = 1.0;
