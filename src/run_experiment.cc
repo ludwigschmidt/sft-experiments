@@ -160,7 +160,8 @@ int main(int argc, char** argv) {
     return 1;
   }
 
-  for (const string& in_file_name : input_file_names) {
+  for (size_t jj = 0; jj < input_file_names.size(); ++jj) {
+    const string& in_file_name = input_file_names[jj];
     vector<dcomplex> input_data;
     double reference_time;
     vector<dcomplex> reference_output;
@@ -190,7 +191,7 @@ int main(int argc, char** argv) {
     }
 
     if (!owriter.WriteInputResult(in_file_name, input_data, reference_output,
-        reference_time, results, true)) {
+        reference_time, results, (jj == input_file_names.size() - 1))) {
       fprintf(stderr, "Could not write output.\n");
       return 1;
     }
