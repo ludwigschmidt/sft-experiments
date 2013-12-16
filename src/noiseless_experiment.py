@@ -7,7 +7,7 @@ from collections import namedtuple
 
 import matplotlib.pyplot as plt
 
-from gen_noiseless import gen_noiseless
+from gen_input import gen_input
 from helpers import build_time_stats
 from run_experiment import run_experiment, extract_running_times, \
     num_l0_errors, write_index_file
@@ -25,9 +25,12 @@ def results_filename(basedir, algo, n, k):
   return os.path.join(basedir,
                       'results_{}_n_{}_k_{}.json'.format(algo, n, k))
 
+def plot_data_filename(basedir, algo):
+  return os.path.join(basedir,
+                      'plot_results_{}.txt'.format(algo))
 
 tmpdir = 'tmpdir2'
-num_instances = 10
+num_instances = 2
 num_trials = 10
 exp1 = 16
 exp2 = 18
@@ -36,8 +39,8 @@ l0_eps = 0.2
 percentile_interval = 95
 random.seed(2314082)
 
-algs = ['fftw', 'sfft3-eth', 'sfft2-eth', 'sfft2-mit']
-#algs = ['sfft3-eth', 'sfft2-eth']
+#algs = ['fftw', 'sfft3-eth', 'sfft2-eth', 'sfft2-mit']
+algs = ['sfft3-eth', 'sfft2-eth']
 results = {}
 for alg in algs:
   results[alg] = {}
@@ -53,7 +56,7 @@ for exp in range(exp1, exp2 + 1):
   for instance in range(1, num_instances + 1):
     print '    instance {}'.format(instance)
     dataf = data_filename(tmpdir, n, k, instance)
-    gen_noiseless(n, k, dataf, random.randint(0, 2000000000))
+    gen_input(n, k, dataf, random.randint(0, 2000000000))
     input_filename.append(dataf)
 
   print '  writing index file ...'
@@ -73,6 +76,19 @@ for exp in range(exp1, exp2 + 1):
 
 print results
 
+
+# pgfplot files
+for alg in algs:
+  data = results[alg]
+  nvals = sorted(data.keys())
+  with open(plot_data_filename(tmpdir, alg), 'w') as f:
+    f.write('n time time_plus time_minus\n')
+    for n in nvals:
+      plus = data[n].percentile_high - data[n].average
+      minus = data[n].average - data[n].percentile_low
+      f.write('{} {} {} {}\n'.format(n, data[n].average, plus, minus))
+
+# Matplotlib
 for alg in algs:
   data = results[alg]
   xvals = sorted(data.keys())

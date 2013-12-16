@@ -1,0 +1,31 @@
+\begin{tikzpicture}
+\pgfplotsset{resultplot/.style={%
+  height=10cm,
+  width=12cm,
+  log basis x=2,
+  xlabel=$n$,
+  ylabel=Time (seconds),
+  grid=major,
+  grid style={dotted,gray,thin},
+  legend cell align=left,
+  legend pos=north west,
+  every axis plot/.append style={
+    error bars/.cd,
+    y dir=both,
+    y explicit,
+    /pgfplots/.cd,
+    line width=1.5pt,
+    mark size=2pt,
+  },
+  cycle list={{red,mark=o},{blue,mark=square},{green,mark=x},{magenta,mark=diamond}}
+}}
+\begin{loglogaxis}[resultplot]
+
+\addplot+ table [x=n, y=time, y error plus=time_plus, y error minus=time_minus] {plot_results_sfft2-eth.txt};
+\addlegendentry{SFFT2-ETH}
+
+\addplot+ table [x=n, y=time, y error plus=time_plus, y error minus=time_minus] {plot_results_sfft3-eth.txt};
+\addlegendentry{SFFT3-ETH}
+
+\end{loglogaxis}
+\end{tikzpicture}

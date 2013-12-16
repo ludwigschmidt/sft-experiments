@@ -60,6 +60,8 @@ int main(int argc, char** argv) {
 
   po::options_description desc("Allowed options");
   desc.add_options()
+      ("add_noise", "If this flag is passed into the program, white Gaussian "
+          "noise is added to each component of the signal.")
       ("firstk", "Do not randomize spectrum support, take the k first indices.")
       ("help", "Show help message.")
       ("k", po::value<size_t>(&k)->default_value(0), "Sparsity")
@@ -67,9 +69,8 @@ int main(int argc, char** argv) {
           "Size of the signal to be generated.")
       ("noise_variance",
           po::value<double>(&noise_variance)->default_value(1.0 / sqrt(2)),
-          "If this flag is passed into the program, white Gaussian noise is "
-          "added to each component of the signal. The parameter specifies the "
-          "variance for both the real and imaginary component.")
+          "This parameter specifies the noise variance for both the real and "
+          "imaginary component.")
       ("output_file", po::value<string>(&output_file)->default_value(""),
           "Output file name (or \"\" for stdout). The default is \"\".")
       ("skip_phase_randomization", "Do not randomize the phase.")
@@ -119,7 +120,7 @@ int main(int argc, char** argv) {
     }
   }
 
-  if (vm.count("noise_variance")) {
+  if (vm.count("add_noise")) {
     for (size_t ii = 0; ii < n; ++ii) {
       dcomplex noise(noise_distribution(prng), noise_distribution(prng));
       signal[ii] += noise;
