@@ -48,6 +48,7 @@ class AAFFTInterface : public FFTInterface {
   }
 
   bool InternalSetup();
+  bool SetImportantParameters();
 };
 
 std::vector<std::complex<double>> AAFFTInterface::input_;
@@ -62,8 +63,9 @@ bool AAFFTInterface::InternalSetup() {
 
   input_.resize(n_);
 
-  // Setup parameters
+  // Parameter setup
 
+  //////////////////////////////////////////////////
   // Parameters that are common across all use cases
   
   // Signal size
@@ -94,42 +96,88 @@ bool AAFFTInterface::InternalSetup() {
   // documentation says 10 is sufficient most of the time. example uses 7.
   params_.set_Num_Fast_Freq_Coefnt_Est_Taylor_Terms(7);
 
-
-  // Paramters for fixed sparsity (50)
-  // Currently we use the parameters from Haitham
-  if (k_ == 50) {
-    // important
-    // Haitham: -I
-    params_.set_Num_FreqID_CoefEst_Iterations(5);
-
-    // important
-    // Haitham: -S
-    params_.set_Max_KShattering_Sample_Points(128);
-    params_.set_Num_KShattering_Sample_Points(128);
-
-    // important
-    // Haitham: -S
-    params_.set_Max_FCE_Sample_Points(128);
-    params_.set_Num_FCE_Sample_Points(128);
-
-    // important
-    // Haitham: -M
-    params_.set_Norm_Estimation_Max(5);
-    params_.set_Norm_Estimation_Num(5);
-
-    // important
-    // Haitham: -M
-    params_.set_Max_FCE_Medians(5);
-    params_.set_Num_FCE_Medians(5);
-
-    // important
-    // Haitham: -E
-    params_.set_FFCE_Iterations(5);
-  } else {
-    // TODO
-    fprintf(stderr, "Unsupported parameter settings.\n");
+  //////////////////////////////////////////////////
+  // Important parameters
+  if (!SetImportantParameters()) {
     return false;
   }
+
+  return true;
+}
+
+bool AAFFTInterface::SetImportantParameters() {
+  // These parameter settings follow Haitham's choices for the SFFT SODA paper.
+
+  // Corresponding to command line variables
+  int I, S, M, E;
+
+  if (k_ == 50) {
+    I = 5;
+    E = 5;
+    S = 128;
+    M = 5;
+  } else if (k_ == 100) {
+    I = 6;
+    E = 5;
+    S = 128;
+    M = 5;
+  } else if (k_ == 200) {
+    I = 6;
+    E = 6;
+    S = 200;
+    M = 6;
+  } else if (k_ == 500) {
+    I = 7;
+    E = 6;
+    S = 440;
+    M = 6;
+  } else if (k_ == 1000) {
+    I = 8;
+    E = 7;
+    S = 640;
+    M = 7;
+  } else if (k_ == 2000) {
+    I = 8;
+    E = 8;
+    S = 1100;
+    M = 9;
+  } else if (k_ == 4000) {
+    I = 8;
+    E = 8;
+    S = 2000;
+    M = 11;
+  } else {
+    fprintf(stderr, "Unsupported parameters\n");
+    return false;
+  }
+
+  // important
+  // Haitham: -I
+  params_.set_Num_FreqID_CoefEst_Iterations(I);
+
+  // important
+  // Haitham: -S
+  params_.set_Max_KShattering_Sample_Points(S);
+  params_.set_Num_KShattering_Sample_Points(S);
+
+  // important
+  // Haitham: -S
+  params_.set_Max_FCE_Sample_Points(S);
+  params_.set_Num_FCE_Sample_Points(S);
+
+  // important
+  // Haitham: -M
+  params_.set_Norm_Estimation_Max(M);
+  params_.set_Norm_Estimation_Num(M);
+
+  // important
+  // Haitham: -M
+  params_.set_Max_FCE_Medians(M);
+  params_.set_Num_FCE_Medians(M);
+
+  // important
+  // Haitham: -E
+  params_.set_FFCE_Iterations(E);
 
   return true;
 }
