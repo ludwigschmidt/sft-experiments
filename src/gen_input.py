@@ -9,3 +9,4 @@ def gen_input(n, k, output_file, seed, randomize_phase=False):
   if not randomize_phase:
     cmd.append('--skip_phase_randomization')
   subprocess.check_output(cmd, stdin=None, stderr=subprocess.STDOUT)
+  return ' '.join(cmd)
