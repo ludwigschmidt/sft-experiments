@@ -60,9 +60,6 @@ class Tee(object):
     self.stdout.write(data)
 
 
-def input_file_cmds_filename(basedir):
-  return os.path.join(basedir, 'input_file_commands.txt')
-
 def index_filename(basedir, n, k):
   return os.path.join(basedir,
                       'input_index_n_{}_k_{}.txt'.format(n, k))
@@ -70,6 +67,11 @@ def index_filename(basedir, n, k):
 def data_filename(basedir, n, k, instance):
   return os.path.join(basedir,
                       'input_n_{}_k_{}_instance_{}.bin'.format(n, k, instance))
+
+def data_stats_filename(basedir, n, k, instance):
+  return os.path.join(basedir,
+                      'input_n_{}_k_{}_instance_{}_stats.txt'.format(n, k,
+                                                                     instance))
 
 def results_filename(basedir, algo, n, k):
   return os.path.join(basedir,

@@ -9,21 +9,19 @@ import matplotlib.pyplot as plt
 
 from gen_input import gen_input
 from helpers import make_data_point, write_data_points_to_file, \
-    plot_data_points, Tee, input_file_cmds_filename, index_filename, \
+    plot_data_points, Tee, data_stats_filename, index_filename, \
     data_filename, results_filename, plot_time_data_filename, \
     plot_l0_error_data_filename, script_output_filename
 from run_experiment import run_experiment, extract_running_times, \
     num_l0_errors, write_index_file, extract_l0_errors, load_results_file, \
     num_l0_correct
 
-
 tmpdir = '/media/ludo/external_linux/sfft_experiments/tmpdir'
-keep_input_files = False
-num_instances = 10
-num_trials = 10
+num_instances = 2
+num_trials = 5
 exp1 = 14
-exp2 = 23
-#exp2 = 17
+#exp2 = 23
+exp2 = 17
 k = 50
 l0_eps = 0.5
 time_percentile_low = 0
@@ -31,14 +29,13 @@ time_percentile_high = 95
 l0_error_percentile_low = 0
 l0_error_percentile_high = 95
 random.seed(7524019)
+plot = True
 
 sys.stdout = Tee(script_output_filename(tmpdir))
 
-input_file_commands = []
-
 #algs = ['fftw', 'sfft3-eth', 'sfft2-eth', 'sfft2-mit', 'aafft']
-#algs = ['sfft3-eth', 'sfft2-eth']
-algs = ['sfft3-eth']
+algs = ['sfft3-eth', 'sfft2-eth']
+#algs = ['sfft3-eth']
 nvals = [int(math.pow(2, exp)) for exp in range(exp1, exp2 + 1)]
 
 for n in nvals:
@@ -48,8 +45,8 @@ for n in nvals:
   for instance in range(1, num_instances + 1):
     print '    instance {}'.format(instance)
     dataf = data_filename(tmpdir, n, k, instance)
-    cmd = gen_input(n, k, dataf, random.randint(0, 2000000000))
-    input_file_commands.append((dataf, cmd))
+    gen_input(n, k, dataf, random.randint(0, 2000000000),
+        stats_file=data_stats_filename(tmpdir, n, k, instance))
     input_filename.append(dataf)
   print '  writing index file ...'
   indexf = index_filename(tmpdir, n, k)
@@ -61,14 +58,8 @@ for n in nvals:
     ne = num_l0_errors(r)
     if ne > 0:
       print '    {} L0-errors occurred.'.format(ne)
-  if not keep_input_files:
-    for f in input_filename:
-      os.remove(f)
-
-with open(input_file_cmds_filename(tmpdir), 'w') as f:
-  for (name, cmd) in input_file_commands:
-    f.write('{} {}\n'.format(name, cmd))
-
+  for f in input_filename:
+    os.remove(f)
 
 time_results = {}
 l0_results = {}
@@ -108,20 +99,21 @@ for alg in algs:
                             plot_l0_error_data_filename(tmpdir, alg),
                             'n', 'l0_error')
 # Matplotlib
-plt.figure(1)
-for alg in algs:
-  plot_data_points(time_results[alg], plt, alg, '-x')
-plt.loglog(basex=2)
-plt.xlabel('n')
-plt.ylabel('time (s)')
-plt.legend()
+if plot:
+  plt.figure(1)
+  for alg in algs:
+    plot_data_points(time_results[alg], plt, alg, '-x')
+  plt.loglog(basex=2)
+  plt.xlabel('n')
+  plt.ylabel('time (s)')
+  plt.legend()
 
-plt.figure(2)
-for alg in algs:
-  plot_data_points(l0_results[alg], plt, alg, 'x')
-plt.semilogx(basex=2)
-plt.xlabel('n')
-plt.ylabel('l0 error (l0-epsilon: {:e})'.format(l0_eps))
-plt.legend()
+  plt.figure(2)
+  for alg in algs:
+    plot_data_points(l0_results[alg], plt, alg, 'x')
+  plt.semilogx(basex=2)
+  plt.xlabel('n')
+  plt.ylabel('l0 error (l0-epsilon: {:e})'.format(l0_eps))
+  plt.legend()
 
-plt.show()
+  plt.show()
