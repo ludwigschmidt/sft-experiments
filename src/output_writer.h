@@ -10,8 +10,6 @@
 
 class OutputWriter {
  public:
-  static std::string CollapseCommand(int argc, char** argv);
-
   OutputWriter(std::ostream* out, double l0_epsilon) : out_(out),
       delete_ostream_(false), l0_epsilon_(l0_epsilon) {}
 

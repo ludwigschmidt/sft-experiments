@@ -1,5 +1,7 @@
 #include "result_helpers.h"
 
+#include "helpers.h"
+
 void ComputeSignalStatistics(const std::vector<std::complex<double>>& signal,
                              double l0_epsilon,
                              SignalStatistics* stats) {
@@ -30,4 +32,22 @@ void ComputeErrorStatistics(const std::vector<std::complex<double>>& output,
     error[ii] = reference_output[ii] - output[ii];
   }
   ComputeSignalStatistics(error, l0_epsilon, stats);
+}
+
+void WriteStatisticsJSONToStream(const SignalStatistics& stats,
+                                 size_t indent,
+                                 std::ostream* out) {
+  std::ostream& oref = *out;
+  std::string indentation = "";
+  for (size_t ii = 0; ii < indent; ++ii) {
+    indentation += " ";
+  }
+
+  oref << indentation << "\"l0\": " << stats.l0 << "," << std::endl;
+  oref << indentation << "\"l1\": " << std::scientific << stats.l1 << ","
+      << std::endl;
+  oref << indentation << "\"l2\": " << std::scientific << stats.l2 << ","
+      << std::endl;
+  oref << indentation << "\"linf\": " << std::scientific << stats.linf
+      << std::endl;
 }

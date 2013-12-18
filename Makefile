@@ -12,7 +12,7 @@ SRCDIR = src
 DEPDIR = .deps
 OBJDIR = obj
 
-SRCS = run_experiment.cc gen_input.cc sfft_eth_interface.cc sfft_mit_interface.cc output_writer.cc result_helpers.cc fft_wrapper.cc
+SRCS = run_experiment.cc gen_input.cc sfft_eth_interface.cc sfft_mit_interface.cc output_writer.cc result_helpers.cc fft_wrapper.cc helpers.cc
 
 .PHONY: clean archive
 
@@ -29,8 +29,8 @@ archive:
 	mv archive-tmp/sfft_benchmark.tar.gz .
 	rm -rf archive-tmp
 
-RUN_EXPERIMENT_OBJS = run_experiment.o sfft_eth_interface.o sfft_mit_interface.o output_writer.o result_helpers.o fft_wrapper.o
-GEN_INPUT_OBJS = gen_input.o
+RUN_EXPERIMENT_OBJS = run_experiment.o sfft_eth_interface.o sfft_mit_interface.o output_writer.o result_helpers.o fft_wrapper.o helpers.o
+GEN_INPUT_OBJS = gen_input.o helpers.o result_helpers.o
 
 # run_experiment executable
 run_experiment: $(RUN_EXPERIMENT_OBJS:%=$(OBJDIR)/%)

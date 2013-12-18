@@ -3,6 +3,8 @@
 #include <fstream>
 #include <sstream>
 
+#include "helpers.h"
+
 using std::complex;
 using std::endl;
 using std::ostream;
@@ -23,17 +25,6 @@ OutputWriter::OutputWriter(const std::string& filename, double l0_epsilon) {
     out_= new std::ofstream(filename);
     delete_ostream_ = true;
   }
-}
-
-string OutputWriter::CollapseCommand(int argc, char** argv) {
-  ostringstream command;
-  for (int ii = 0; ii < argc; ++ii) {
-    if (ii != 0) {
-      command << " ";
-    }
-    command << argv[ii];
-  }
-  return command.str();
 }
 
 bool OutputWriter::WritePrelude(const string& command) {
@@ -64,16 +55,7 @@ bool OutputWriter::WriteEnd() {
 
 void OutputWriter::WriteSignalStatistics(const SignalStatistics& stats,
                                          size_t indent) {
-  ostream& oref = *out_;
-  string indentation = "";
-  for (size_t ii = 0; ii < indent; ++ii) {
-    indentation += " ";
-  }
-
-  oref << indentation << "\"l0\": " << stats.l0 << "," << endl;
-  oref << indentation << "\"l1\": " << scientific << stats.l1 << "," << endl;
-  oref << indentation << "\"l2\": " << scientific << stats.l2 << "," << endl;
-  oref << indentation << "\"linf\": " << scientific << stats.linf << endl;
+  WriteStatisticsJSONToStream(stats, indent, out_);
 }
 
 bool OutputWriter::WriteInputResult(const string& input_name,

@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <cmath>
 #include <complex>
+#include <ostream>
 #include <vector>
 
 struct SignalStatistics {
@@ -26,5 +27,9 @@ void ComputeSignalStatistics(const std::vector<std::complex<double>>& signal,
 void ComputeErrorStatistics(const std::vector<std::complex<double>>& output,
     const std::vector<std::complex<double>>& reference_output,
     double l0_epsilon, SignalStatistics* stats);
+
+void WriteStatisticsJSONToStream(const SignalStatistics& stats,
+                                 size_t indent,
+                                 std::ostream* out);
 
 #endif
