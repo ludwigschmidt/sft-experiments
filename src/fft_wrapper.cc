@@ -11,6 +11,8 @@ bool FFTWrapper::ParseType(const std::string& str, Type* type) {
     *type = Type::AAFFT;
   } else if (lower == "fftw") {
     *type = Type::FFTW;
+  } else if (lower == "sfft1-eth") {
+    *type = Type::SFFT1_ETH;
   } else if (lower == "sfft2-eth") {
     *type = Type::SFFT2_ETH;
   } else if (lower == "sfft2-mit") {
@@ -28,6 +30,9 @@ bool FFTWrapper::Setup() {
     fft_.reset(new AAFFTInterface(n_, k_));
   } else if (type_ == Type::FFTW) {
     fft_.reset(new FFTWInterface(n_, true));
+  } else if (type_ == Type::SFFT1_ETH) {
+    fft_.reset(new SFFTETHInterface(n_, k_, SFFTETHInterface::Version::SFFT_1,
+          false));
   } else if (type_ == Type::SFFT2_ETH) {
     fft_.reset(new SFFTETHInterface(n_, k_, SFFTETHInterface::Version::SFFT_2,
           false));

@@ -10,10 +10,10 @@
 
 class OutputWriter {
  public:
-  OutputWriter(std::ostream* out, double l0_epsilon) : out_(out),
-      delete_ostream_(false), l0_epsilon_(l0_epsilon) {}
+  OutputWriter(std::ostream* out, size_t k, double l0_epsilon) : out_(out),
+      delete_ostream_(false), k_(k), l0_epsilon_(l0_epsilon) {}
 
-  OutputWriter(const std::string& filename, double l0_epsilon);
+  OutputWriter(const std::string& filename, size_t k, double l0_epsilon);
 
   ~OutputWriter();
   
@@ -32,6 +32,7 @@ class OutputWriter {
  private:
   std::ostream* out_;
   bool delete_ostream_;
+  size_t k_;
   double l0_epsilon_;
 
   void WriteSignalStatistics(const SignalStatistics& stats, size_t indent);

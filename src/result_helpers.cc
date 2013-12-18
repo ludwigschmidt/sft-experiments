@@ -1,5 +1,9 @@
 #include "result_helpers.h"
 
+#include <algorithm>
+#include <cmath>
+#include <map>
+
 #include "helpers.h"
 
 void ComputeSignalStatistics(const std::vector<std::complex<double>>& signal,
@@ -50,4 +54,22 @@ void WriteStatisticsJSONToStream(const SignalStatistics& stats,
       << std::endl;
   oref << indentation << "\"linf\": " << std::scientific << stats.linf
       << std::endl;
+}
+
+void ComputeBestKTermRepresentation(const std::vector<std::complex<double>>& x,
+                                    size_t k,
+                                    std::vector<std::complex<double>>* x_k) {
+  size_t n = x.size();
+  x_k->resize(n);
+  x_k->assign(n, std::complex<double>(0.0, 0.0));
+
+  std::vector<std::pair<double, size_t>> coeffs;
+  coeffs.reserve(n);
+  for (size_t ii = 0; ii < n; ++ii) {
+    coeffs.push_back(std::make_pair(std::abs(x[ii]), ii));
+  }
+  std::sort(coeffs.begin(), coeffs.end());
+  for (size_t ii = n - 1; ii >= n - k; --ii) {
+    (*x_k)[coeffs[ii].second] = x[coeffs[ii].second];
+  }
 }

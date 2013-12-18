@@ -15,8 +15,11 @@ using std::vector;
 
 typedef complex<double> dcomplex;
 
-OutputWriter::OutputWriter(const std::string& filename, double l0_epsilon) {
+OutputWriter::OutputWriter(const std::string& filename,
+                           size_t k,
+                           double l0_epsilon) {
   l0_epsilon_ = l0_epsilon;
+  k_ = k;
 
   if (filename.empty()) {
     out_ = &std::cout;
@@ -69,6 +72,14 @@ bool OutputWriter::WriteInputResult(const string& input_name,
   SignalStatistics ref_output_stats;
   ComputeSignalStatistics(ref_output, l0_epsilon_, &ref_output_stats);
 
+  vector<dcomplex> best_k_term;
+  ComputeBestKTermRepresentation(ref_output, k_, &best_k_term);
+  SignalStatistics best_k_term_stats;
+  ComputeSignalStatistics(best_k_term, l0_epsilon_, &best_k_term_stats);
+  SignalStatistics best_k_term_error_stats;
+  ComputeErrorStatistics(best_k_term, ref_output, l0_epsilon_,
+      &best_k_term_error_stats);
+
   ostream& oref = *out_;
   if (!oref.good()) {
     return false;
@@ -81,6 +92,12 @@ bool OutputWriter::WriteInputResult(const string& input_name,
        << endl;
   oref << "      \"reference_output_stats\": {" << endl;
   WriteSignalStatistics(ref_output_stats, 8);
+  oref << "      }," << endl;
+  oref << "      \"best_k_term_stats\": {" << endl;
+  WriteSignalStatistics(best_k_term_stats, 8);
+  oref << "      }," << endl;
+  oref << "      \"best_k_term_error_stats\": {" << endl;
+  WriteSignalStatistics(best_k_term_error_stats, 8);
   oref << "      }," << endl;
   oref << "      \"results\": [" << endl;
   for (size_t ii = 0; ii < results.size(); ++ii) {

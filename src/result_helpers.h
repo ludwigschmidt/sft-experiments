@@ -32,4 +32,8 @@ void WriteStatisticsJSONToStream(const SignalStatistics& stats,
                                  size_t indent,
                                  std::ostream* out);
 
+void ComputeBestKTermRepresentation(const std::vector<std::complex<double>>& x,
+                                    size_t k,
+                                    std::vector<std::complex<double>>* x_k);
+
 #endif

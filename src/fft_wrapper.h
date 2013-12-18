@@ -15,6 +15,7 @@ class FFTWrapper {
   enum class Type {
       AAFFT,
       FFTW,
+      SFFT1_ETH,
       SFFT2_ETH,
       SFFT2_MIT,
       SFFT3_ETH,

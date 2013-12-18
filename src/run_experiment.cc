@@ -154,7 +154,7 @@ int main(int argc, char** argv) {
     return 1;
   }
 
-  OutputWriter owriter(output_file, l0_epsilon);
+  OutputWriter owriter(output_file, k, l0_epsilon);
   if (!owriter.WritePrelude(argc, argv)) {
     fprintf(stderr, "Could not write output.\n");
     return 1;
