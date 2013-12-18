@@ -17,10 +17,12 @@ bool SFFTMITInterface::InternalSetup() {
     return false;
   }
 
+  bool use_comb = (version_ == Version::SFFT_2);
+  
   sfft_mit::TIMING = false;
   sfft_mit::VERBOSE = false;
   sfft_mit::ALGORITHM1 = true;
-  sfft_mit::WITH_COMB = true;
+  sfft_mit::WITH_COMB = use_comb;
 
   double Bcst_loc = 1.0;
   double Bcst_est = 1.0;
@@ -35,11 +37,11 @@ bool SFFTMITInterface::InternalSetup() {
   loops_loc_ = -1;
 
   if (k_ == 50) {
-    get_expermient_vs_N_parameters(n_, true, Bcst_loc, Bcst_est, Comb_cst,
+    get_expermient_vs_N_parameters(n_, use_comb, Bcst_loc, Bcst_est, Comb_cst,
         loops_loc_, loops_est_, loops_thresh_, Comb_loops_, tolerance_loc,
         tolerance_est);
   } else if (n_ == 4194304) {
-    get_expermient_vs_K_parameters(k_, true, Bcst_loc, Bcst_est, Comb_cst,
+    get_expermient_vs_K_parameters(k_, use_comb, Bcst_loc, Bcst_est, Comb_cst,
         loops_loc_, loops_est_, loops_thresh_, Comb_loops_, tolerance_loc,
         tolerance_est);
   } else {

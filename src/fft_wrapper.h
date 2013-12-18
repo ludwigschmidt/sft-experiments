@@ -16,6 +16,7 @@ class FFTWrapper {
       AAFFT,
       FFTW,
       SFFT1_ETH,
+      SFFT1_MIT,
       SFFT2_ETH,
       SFFT2_MIT,
       SFFT3_ETH,
@@ -37,6 +38,5 @@ class FFTWrapper {
   Type type_;
   std::unique_ptr<FFTInterface> fft_;
 };
-
 
 #endif

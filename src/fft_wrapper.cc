@@ -13,6 +13,8 @@ bool FFTWrapper::ParseType(const std::string& str, Type* type) {
     *type = Type::FFTW;
   } else if (lower == "sfft1-eth") {
     *type = Type::SFFT1_ETH;
+  } else if (lower == "sfft1-mit") {
+    *type = Type::SFFT1_MIT;
   } else if (lower == "sfft2-eth") {
     *type = Type::SFFT2_ETH;
   } else if (lower == "sfft2-mit") {
@@ -33,11 +35,13 @@ bool FFTWrapper::Setup() {
   } else if (type_ == Type::SFFT1_ETH) {
     fft_.reset(new SFFTETHInterface(n_, k_, SFFTETHInterface::Version::SFFT_1,
           false));
+  } else if (type_ == Type::SFFT1_MIT) {
+    fft_.reset(new SFFTMITInterface(n_, k_, SFFTMITInterface::Version::SFFT_1));
   } else if (type_ == Type::SFFT2_ETH) {
     fft_.reset(new SFFTETHInterface(n_, k_, SFFTETHInterface::Version::SFFT_2,
           false));
   } else if (type_ == Type::SFFT2_MIT) {
-    fft_.reset(new SFFTMITInterface(n_, k_));
+    fft_.reset(new SFFTMITInterface(n_, k_, SFFTMITInterface::Version::SFFT_2));
   } else if (type_ == Type::SFFT3_ETH) {
     fft_.reset(new SFFTETHInterface(n_, k_, SFFTETHInterface::Version::SFFT_3,
           false));

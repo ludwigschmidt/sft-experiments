@@ -10,7 +10,13 @@
 
 class SFFTMITInterface : public FFTInterface {
  public:
-  SFFTMITInterface(size_t n, size_t k) : n_(n), k_(k) {};
+  enum class Version {
+    SFFT_1,
+    SFFT_2,
+  };
+
+  SFFTMITInterface(size_t n, size_t k, Version version) : version_(version),
+      n_(n), k_(k) {};
 
   bool Setup();
 
@@ -21,6 +27,7 @@ class SFFTMITInterface : public FFTInterface {
   ~SFFTMITInterface();
 
  private:
+  Version version_;
   size_t n_;
   size_t k_;
   complex_t* input_;
