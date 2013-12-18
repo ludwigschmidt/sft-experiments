@@ -1,4 +1,6 @@
 import math
+import os
+import sys
 
 from collections import namedtuple
 
@@ -42,4 +44,44 @@ def plot_data_points(points, plt, label, fmt):
   yerr_plus = [points[x].error_plus for x in xvals]
   plt.errorbar(xvals, yvals, yerr=[yerr_minus, yerr_plus], fmt=fmt,
                label=label)
-  
+
+
+class Tee(object):
+  def __init__(self, name):
+    self.logfile = open(name, 'w')
+    self.stdout = sys.stdout
+    sys.stdout = self
+  def __del__(self):
+    sys.stdout = self.stdout
+    self.logfile.close()
+  def write(self, data):
+    self.logfile.write(data)
+    self.logfile.flush()
+    self.stdout.write(data)
+
+
+def input_file_cmds_filename(basedir):
+  return os.path.join(basedir, 'input_file_commands.txt')
+
+def index_filename(basedir, n, k):
+  return os.path.join(basedir,
+                      'input_index_n_{}_k_{}.txt'.format(n, k))
+
+def data_filename(basedir, n, k, instance):
+  return os.path.join(basedir,
+                      'input_n_{}_k_{}_instance_{}.bin'.format(n, k, instance))
+
+def results_filename(basedir, algo, n, k):
+  return os.path.join(basedir,
+                      'results_{}_n_{}_k_{}.json'.format(algo, n, k))
+
+def plot_time_data_filename(basedir, algo):
+  return os.path.join(basedir,
+                      'plot_time_results_{}.txt'.format(algo))
+
+def plot_l0_error_data_filename(basedir, algo):
+  return os.path.join(basedir,
+                      'plot_l0_error_results_{}.txt'.format(algo))
+
+def script_output_filename(basedir):
+  return os.path.join(basedir, 'script_output.txt')

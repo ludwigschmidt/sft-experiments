@@ -16,15 +16,13 @@ from run_experiment import run_experiment, extract_running_times, \
     num_l0_errors, write_index_file, extract_l0_errors, load_results_file, \
     num_l0_correct
 
-
-tmpdir = '/media/ludo/external_linux/sfft_experiments/tmpdir'
+tmpdir = 'tmpdir'
 keep_input_files = False
-num_instances = 10
-num_trials = 10
-exp1 = 14
-exp2 = 23
-#exp2 = 17
-k = 50
+num_instances = 2
+num_trials = 5
+n = int(math.pow(2, 22))
+#kvals = [50, 100, 200, 500, 1000, 2000, 4000]
+kvals = [2000, 4000]
 l0_eps = 0.5
 time_percentile_low = 0
 time_percentile_high = 95
@@ -36,13 +34,11 @@ sys.stdout = Tee(script_output_filename(tmpdir))
 
 input_file_commands = []
 
-#algs = ['fftw', 'sfft3-eth', 'sfft2-eth', 'sfft2-mit', 'aafft']
+algs = ['fftw', 'sfft3-eth', 'sfft2-eth', 'sfft2-mit', 'aafft']
 #algs = ['sfft3-eth', 'sfft2-eth']
-algs = ['sfft3-eth']
-nvals = [int(math.pow(2, exp)) for exp in range(exp1, exp2 + 1)]
 
-for n in nvals:
-  print 'n = {}'.format(n)
+for k in kvals:
+  print 'k = {}'.format(k)
   print '  generating input data ...'
   input_filename = []
   for instance in range(1, num_instances + 1):
@@ -79,16 +75,16 @@ for alg in algs:
   l0_results[alg] = {}
   success_results[alg] = {}
 
-for n in nvals:
+for k in kvals:
   for alg in algs:
     r = load_results_file(results_filename(tmpdir, alg, n, k))
     times = extract_running_times(r)
-    time_results[alg][n] = make_data_point(times, time_percentile_low,
+    time_results[alg][k] = make_data_point(times, time_percentile_low,
                                            time_percentile_high)
     l0_errors = extract_l0_errors(r)
-    l0_results[alg][n] = make_data_point(l0_errors, l0_error_percentile_low,
+    l0_results[alg][k] = make_data_point(l0_errors, l0_error_percentile_low,
                                          l0_error_percentile_high)
-    success_results[alg][n] = float(num_l0_correct(r)) \
+    success_results[alg][k] = float(num_l0_correct(r)) \
                                   / (num_instances * num_trials)
 
 print '\n'
@@ -103,24 +99,24 @@ print success_results
 for alg in algs:
   write_data_points_to_file(time_results[alg],
                             plot_time_data_filename(tmpdir, alg),
-                            'n', 'time')
+                            'k', 'time')
   write_data_points_to_file(l0_results[alg],
                             plot_l0_error_data_filename(tmpdir, alg),
-                            'n', 'l0_error')
+                            'k', 'l0_error')
 # Matplotlib
 plt.figure(1)
 for alg in algs:
   plot_data_points(time_results[alg], plt, alg, '-x')
-plt.loglog(basex=2)
-plt.xlabel('n')
+plt.loglog(basex=10)
+plt.xlabel('k')
 plt.ylabel('time (s)')
 plt.legend()
 
 plt.figure(2)
 for alg in algs:
   plot_data_points(l0_results[alg], plt, alg, 'x')
-plt.semilogx(basex=2)
-plt.xlabel('n')
+plt.semilogx(basex=10)
+plt.xlabel('k')
 plt.ylabel('l0 error (l0-epsilon: {:e})'.format(l0_eps))
 plt.legend()
 
