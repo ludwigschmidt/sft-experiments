@@ -69,7 +69,11 @@ bool SFFTMITInterface::InternalSetup() {
 
   W_Comb_ = sfft_mit::floor_to_pow2(Comb_cst * n_ / B_loc_);
 
-  assert(B_thresh_ < W_Comb_);
+  if (use_comb) {
+    assert(B_thresh_ < W_Comb_);
+  }
+  assert(B_thresh_ < B_loc_);
+  assert(loops_thresh_ <= loops_loc_);
 
   int w_loc;
   complex_t* filtert = make_dolphchebyshev_t(lobefrac_loc, tolerance_loc,
