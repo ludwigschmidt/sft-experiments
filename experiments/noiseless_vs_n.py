@@ -16,12 +16,12 @@ from run_experiment import run_experiment, extract_running_times, \
     num_l0_errors, write_index_file, extract_l0_errors, load_results_file, \
     num_l0_correct
 
-tmpdir = '/media/ludo/external_linux/sfft_experiments/tmpdir'
-num_instances = 2
-num_trials = 5
+tmpdir = '/media/ludo/external_linux/sfft_experiments/tmpdir1'
+num_instances = 10
+num_trials = 10
 exp1 = 14
-#exp2 = 23
-exp2 = 17
+exp2 = 24
+#exp2 = 17
 k = 50
 l0_eps = 0.5
 time_percentile_low = 0
@@ -29,12 +29,12 @@ time_percentile_high = 95
 l0_error_percentile_low = 0
 l0_error_percentile_high = 95
 random.seed(7524019)
-plot = True
+plot = False
 
 sys.stdout = Tee(script_output_filename(tmpdir))
 
-#algs = ['fftw', 'sfft3-eth', 'sfft2-eth', 'sfft2-mit', 'aafft']
-algs = ['sfft3-eth', 'sfft2-eth']
+algs = ['fftw', 'sfft3-eth', 'sfft2-eth', 'sfft2-mit', 'sfft1-eth', 'sfft1-mit', 'aafft']
+#algs = ['sfft3-eth', 'sfft2-eth']
 #algs = ['sfft3-eth']
 nvals = [int(math.pow(2, exp)) for exp in range(exp1, exp2 + 1)]
 

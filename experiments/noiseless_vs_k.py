@@ -16,24 +16,24 @@ from run_experiment import run_experiment, extract_running_times, \
     num_l0_errors, write_index_file, extract_l0_errors, load_results_file, \
     num_l0_correct
 
-tmpdir = '/media/ludo/external_linux/sfft_experiments/tmpdir'
-num_instances = 2
-num_trials = 5
+tmpdir = '/media/ludo/external_linux/sfft_experiments/tmpdir2'
+num_instances = 10
+num_trials = 10
 n = int(math.pow(2, 22))
-#kvals = [50, 100, 200, 500, 1000, 2000, 4000]
-kvals = [2000, 4000]
+kvals = [50, 100, 200, 500, 1000, 2000, 4000]
+#kvals = [2000, 4000]
 l0_eps = 0.5
 time_percentile_low = 0
 time_percentile_high = 95
 l0_error_percentile_low = 0
 l0_error_percentile_high = 95
 random.seed(7524019)
-plot = True
+plot = False
 
 sys.stdout = Tee(script_output_filename(tmpdir))
 
-#algs = ['fftw', 'sfft3-eth', 'sfft2-eth', 'sfft2-mit', 'aafft']
-algs = ['sfft3-eth', 'sfft2-eth']
+algs = ['fftw', 'sfft3-eth', 'sfft2-eth', 'sfft2-mit', 'sfft1-eth', 'sfft1-mit', 'aafft']
+#algs = ['sfft3-eth', 'sfft2-eth']
 
 for k in kvals:
   print 'k = {}'.format(k)
