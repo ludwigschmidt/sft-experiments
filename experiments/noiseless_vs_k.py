@@ -16,7 +16,7 @@ from run_experiment import run_experiment, extract_running_times, \
     num_l0_errors, write_index_file, extract_l0_errors, load_results_file, \
     num_l0_correct
 
-tmpdir = '/media/ludo/external_linux/sfft_experiments/tmpdir2'
+tmpdir = '/media/ludo/backup750/sfft_experiments/noiseless_vs_k'
 num_instances = 10
 num_trials = 10
 n = int(math.pow(2, 22))
@@ -32,7 +32,7 @@ plot = False
 
 sys.stdout = Tee(script_output_filename(tmpdir))
 
-algs = ['fftw', 'sfft3-eth', 'sfft2-eth', 'sfft2-mit', 'sfft1-eth', 'sfft1-mit', 'aafft']
+algs = ['fftw', 'sfft2-eth', 'sfft2-mit', 'sfft1-eth', 'sfft1-mit', 'aafft']
 #algs = ['sfft3-eth', 'sfft2-eth']
 
 for k in kvals:

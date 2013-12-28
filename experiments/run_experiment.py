@@ -95,8 +95,8 @@ def load_results_file(filename):
     return parse_results_json(json.load(f))
 
 
-def run_experiment(n, k, input_index, algorithm, l0_epsilon, num_trials,
-                   output_file):
+def run_experiment(n, k, input_index, algorithm, l0_epsilon, num_trials, seed,
+                   output_file, num_warmup_runs=10, rounded_real_output=False):
   cmd = ['./run_experiment']
   cmd.extend(['--n', str(n)])
   cmd.extend(['--k', str(k)])
@@ -104,7 +104,11 @@ def run_experiment(n, k, input_index, algorithm, l0_epsilon, num_trials,
   cmd.extend(['--algorithm', algorithm])
   cmd.extend(['--l0_epsilon', str(l0_epsilon)])
   cmd.extend(['--num_trials', str(num_trials)])
+  cmd.extend(['--num_warmup_runs', str(num_warmup_runs)])
+  cmd.extend(['--seed', str(seed)])
   if (len(output_file) > 0):
     cmd.extend(['--output_file', output_file])
+  if rounded_real_output:
+    cmd.append('--rounded_real_output')
   subprocess.call(cmd, stdin=None, stderr=subprocess.STDOUT)
   return load_results_file(output_file)

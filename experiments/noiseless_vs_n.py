@@ -16,7 +16,7 @@ from run_experiment import run_experiment, extract_running_times, \
     num_l0_errors, write_index_file, extract_l0_errors, load_results_file, \
     num_l0_correct
 
-tmpdir = '/media/ludo/external_linux/sfft_experiments/tmpdir1'
+tmpdir = '/media/ludo/backup750/sfft_experiments2/noiseless_vs_n'
 num_instances = 10
 num_trials = 10
 exp1 = 14
@@ -45,7 +45,7 @@ for n in nvals:
   for instance in range(1, num_instances + 1):
     print '    instance {}'.format(instance)
     dataf = data_filename(tmpdir, n, k, instance)
-    gen_input(n, k, dataf, random.randint(0, 2000000000),
+    gen_input(n, k, dataf, seed=random.randint(0, 2000000000),
         stats_file=data_stats_filename(tmpdir, n, k, instance))
     input_filename.append(dataf)
   print '  writing index file ...'
@@ -54,7 +54,9 @@ for n in nvals:
   for alg in algs:
     resultsf = results_filename(tmpdir, alg, n, k)
     print '  algorithm: {}'.format(alg)
-    r = run_experiment(n, k, indexf, alg, l0_eps, num_trials, resultsf)
+    r = run_experiment(n, k, indexf, alg, l0_eps, num_trials,
+        seed=random.randint(0, 2000000000), output_file=resultsf,
+        rounded_real_output=True)
     ne = num_l0_errors(r)
     if ne > 0:
       print '    {} L0-errors occurred.'.format(ne)

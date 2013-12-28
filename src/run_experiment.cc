@@ -21,6 +21,7 @@ using std::endl;
 using std::getline;
 using std::ifstream;
 using std::istream;
+using std::round;
 using std::string;
 using std::vector;
 
@@ -86,6 +87,13 @@ bool GetFileLines(const string& filename, vector<string>* lines) {
   return true;
 }
 
+void RoundReal(vector<dcomplex>* data) {
+  for (size_t ii = 0; ii < data->size(); ++ii) {
+    (*data)[ii].real(round((*data)[ii].real()));
+    (*data)[ii].imag(0.0);
+  }
+}
+
 
 int main(int argc, char** argv) {
   string algorithm;
@@ -95,7 +103,10 @@ int main(int argc, char** argv) {
   double l0_epsilon;
   size_t n;
   size_t num_trials;
+  size_t num_warmup_runs;
+  bool rounded_real_output;
   string output_file;
+  size_t seed;
 
   po::options_description desc("Allowed options");
   desc.add_options()
@@ -116,8 +127,13 @@ int main(int argc, char** argv) {
           "Number of elements in the input.")
       ("num_trials", po::value<size_t>(&num_trials)->default_value(1),
           "Number of trials.")
+      ("num_warmup_runs", po::value<size_t>(&num_warmup_runs)->default_value(1),
+          "Number of warm-up runs.")
+      ("rounded_real_output", "Keep only the rounded real part of the output.")
       ("output_file", po::value<string>(&output_file)->default_value(""),
-          "Output file name (or \"\" for stdout). The default is \"\".");
+          "Output file name (or \"\" for stdout). The default is \"\".")
+      ("seed", po::value<size_t>(&seed)->default_value(3492858),
+          "Seed for the standard C PRNG.");
   po::variables_map vm;
   po::store(po::parse_command_line(argc, argv, desc), vm);
   po::notify(vm);
@@ -126,6 +142,10 @@ int main(int argc, char** argv) {
     cout << desc << endl;
     return 0;
   }
+
+  srand(seed);
+
+  rounded_real_output = vm.count("rounded_real_output");
 
   FFTWrapper::Type fft_type;
   if (!FFTWrapper::ParseType(algorithm, &fft_type)) {
@@ -176,15 +196,26 @@ int main(int argc, char** argv) {
       fprintf(stderr, "Could not compute reference output.\n");
       return 1;
     }
+    if (rounded_real_output) {
+      RoundReal(&reference_output);
+    }
 
-    // Warm-up run
     RunResult current_result;
     vector<dcomplex> output;
-    fft.RunTrial(input_data, &output, &current_result.time);
+
+    // Warm-up runs
+    for (size_t ii = 0; ii < num_warmup_runs; ++ii) {
+      fft.RunTrial(input_data, &output, &current_result.time);
+    }
 
     vector<RunResult> results;
     for (size_t ii = 0; ii < num_trials; ++ii) {
       fft.RunTrial(input_data, &output, &current_result.time);
+
+      if (rounded_real_output) {
+        RoundReal(&output);
+      }
+
       ComputeErrorStatistics(output, reference_output, l0_epsilon,
           &(current_result.error_statistics));
       ComputeSignalStatistics(output, l0_epsilon,
