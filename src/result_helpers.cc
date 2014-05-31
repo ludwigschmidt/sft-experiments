@@ -38,6 +38,22 @@ void ComputeErrorStatistics(const std::vector<std::complex<double>>& output,
   ComputeSignalStatistics(error, l0_epsilon, stats);
 }
 
+void ComputeTopKErrorStatistics(const std::vector<std::complex<double>>& output,
+    const std::vector<std::complex<double>>& reference_output,
+    double l0_epsilon, int k, SignalStatistics* stats) {
+  std::vector<std::complex<double>> output_topk;
+  ComputeBestKTermRepresentation(output, k, &output_topk);
+
+  std::vector<std::complex<double>> ref_output_topk;
+  ComputeBestKTermRepresentation(reference_output, k, &ref_output_topk);
+
+  std::vector<std::complex<double>> error(output.size());
+  for (size_t ii = 0; ii < output.size(); ++ii) {
+    error[ii] = ref_output_topk[ii] - output_topk[ii];
+  }
+  ComputeSignalStatistics(error, l0_epsilon, stats);
+}
+
 void WriteStatisticsJSONToStream(const SignalStatistics& stats,
                                  size_t indent,
                                  std::ostream* out) {

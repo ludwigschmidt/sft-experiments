@@ -218,6 +218,8 @@ int main(int argc, char** argv) {
 
       ComputeErrorStatistics(output, reference_output, l0_epsilon,
           &(current_result.error_statistics));
+      ComputeTopKErrorStatistics(output, reference_output, l0_epsilon, k,
+          &(current_result.topk_error_statistics));
       ComputeSignalStatistics(output, l0_epsilon,
                               &(current_result.output_statistics));
       results.push_back(current_result);

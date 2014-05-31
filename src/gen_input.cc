@@ -19,6 +19,7 @@ namespace po = boost::program_options;
 using std::complex;
 using std::cout;
 using std::endl;
+using std::log10;
 using std::ofstream;
 using std::string;
 using std::vector;
@@ -89,7 +90,8 @@ bool WriteStatsFile(int argc, char** argv,
   out << "  \"final_signal_stats\": {" << endl;
   WriteStatisticsJSONToStream(final_signal_stats, 4, &out);
   out << "  }," << endl;
-  out << "  \"snr\": " << std::scientific << snr << endl;
+  out << "  \"snr\": " << std::scientific << snr << "," << endl;
+  out << "  \"snr_db\": " << std::scientific << 10.0 * log10(snr) << endl;
   out << "}" << endl;
 
   return out.good();

@@ -17,7 +17,7 @@
     line width=1.5pt,
     mark size=3pt,
   },
-  cycle list={{red,mark=o},{blue,mark=square},{green,mark=x},{magenta,mark=diamond},{cyan,mark=star},{orange,mark=triangle},{olive,mark=pentagon}}
+  cycle list={{green,mark=o},{orange,mark=square},{magenta,mark=x},{red,mark=diamond},{cyan,mark=star},{blue,mark=triangle},{olive,mark=pentagon}}
 }}
 \begin{semilogxaxis}[resultplot]
 \addplot+ table [x=n, y=l0_error, y error plus=error_plus, y error minus=error_minus] {plot_l0_error_results_aafft.txt};

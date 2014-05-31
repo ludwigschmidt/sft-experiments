@@ -60,22 +60,46 @@ class Tee(object):
     self.stdout.write(data)
 
 
+def snr_string(snr):
+  return str(int(round(snr))) + 'db'
+
+
 def index_filename(basedir, n, k):
   return os.path.join(basedir,
                       'input_index_n_{}_k_{}.txt'.format(n, k))
 
+def index_filename_snr(basedir, n, k, snr):
+  return os.path.join(basedir,
+                      'input_index_n_{}_k_{}_snr_{}.txt'.format(n, k,
+                          snr_string(snr)))
+
 def data_filename(basedir, n, k, instance):
   return os.path.join(basedir,
                       'input_n_{}_k_{}_instance_{}.bin'.format(n, k, instance))
+
+def data_filename_snr(basedir, n, k, snr, instance):
+  return os.path.join(basedir,
+                      'input_n_{}_k_{}_snr_{}_instance_{}.bin'.format(n, k,
+                          snr_string(snr), instance))
 
 def data_stats_filename(basedir, n, k, instance):
   return os.path.join(basedir,
                       'input_n_{}_k_{}_instance_{}_stats.txt'.format(n, k,
                                                                      instance))
 
+def data_stats_filename_snr(basedir, n, k, snr, instance):
+  return os.path.join(basedir,
+                      'input_n_{}_k_{}_snr_{}_instance_{}_stats.txt'.format(n,
+                          k, snr_string(snr), instance))
+
 def results_filename(basedir, algo, n, k):
   return os.path.join(basedir,
                       'results_{}_n_{}_k_{}.json'.format(algo, n, k))
+
+def results_filename_snr(basedir, algo, n, k, snr):
+  return os.path.join(basedir,
+                      'results_{}_n_{}_k_{}_snr_{}.json'.format(algo, n, k,
+                          snr_string(snr)))
 
 def plot_time_data_filename(basedir, algo):
   return os.path.join(basedir,
@@ -85,5 +109,20 @@ def plot_l0_error_data_filename(basedir, algo):
   return os.path.join(basedir,
                       'plot_l0_error_results_{}.txt'.format(algo))
 
+def plot_topk_l1_error_per_entry_data_filename(basedir, algo):
+  return os.path.join(basedir,
+                      'plot_topk_l1_error_per_entry_results_{}.txt'.format(
+                          algo))
+
+def plot_relative_l2_l2_error_data_filename(basedir, algo):
+  return os.path.join(basedir,
+                      'plot_relative_l2_l2_error_results_{}.txt'.format(algo))
+
 def script_output_filename(basedir):
   return os.path.join(basedir, 'script_output.txt')
+
+def ratio_to_db(ratio):
+  return 10.0 * math.log10(ratio)
+
+def db_to_ratio(db):
+  return math.pow(10, db / 10.0)

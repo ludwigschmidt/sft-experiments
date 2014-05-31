@@ -17,29 +17,29 @@
     line width=1.5pt,
     mark size=3pt,
   },
-  cycle list={{green,mark=o},{orange,mark=square},{magenta,mark=x},{red,mark=diamond},{cyan,mark=star},{blue,mark=triangle},{olive,mark=pentagon}}
+  cycle list={{green,mark=o},{green,dashed,mark=o},{orange,mark=square},{red,mark=diamond},{blue,mark=triangle},{red,dashed,mark=diamond},{blue,dashed,mark=triangle}}
 }}
 \begin{loglogaxis}[resultplot]
 \addplot+ table [x=n, y=time, y error plus=error_plus, y error minus=error_minus] {plot_time_results_aafft.txt};
 \addlegendentry{AAFFT}
 
+\addplot+ table [x=n, y=time, y error plus=error_plus, y error minus=error_minus] {noiseless_plot_time_results_aafft.txt};
+\addlegendentry{AAFFT (no noise)}
+
 \addplot+ table [x=n, y=time, y error plus=error_plus, y error minus=error_minus] {plot_time_results_fftw.txt};
 \addlegendentry{FFTW}
-
-\addplot+ table [x=n, y=time, y error plus=error_plus, y error minus=error_minus] {plot_time_results_sfft1-eth.txt};
-\addlegendentry{SFFT1-ETH}
 
 \addplot+ table [x=n, y=time, y error plus=error_plus, y error minus=error_minus] {plot_time_results_sfft1-mit.txt};
 \addlegendentry{SFFT1-MIT}
 
-\addplot+ table [x=n, y=time, y error plus=error_plus, y error minus=error_minus] {plot_time_results_sfft2-eth.txt};
-\addlegendentry{SFFT2-ETH}
-
 \addplot+ table [x=n, y=time, y error plus=error_plus, y error minus=error_minus] {plot_time_results_sfft2-mit.txt};
 \addlegendentry{SFFT2-MIT}
 
-\addplot+ table [x=n, y=time, y error plus=error_plus, y error minus=error_minus] {plot_time_results_sfft3-eth.txt};
-\addlegendentry{SFFT3-ETH}
+\addplot+ table [x=n, y=time, y error plus=error_plus, y error minus=error_minus] {noiseless_plot_time_results_sfft1-mit.txt};
+\addlegendentry{SFFT1-MIT (no noise)}
+
+\addplot+ table [x=n, y=time, y error plus=error_plus, y error minus=error_minus] {noiseless_plot_time_results_sfft2-mit.txt};
+\addlegendentry{SFFT2-MIT (no noise)}
 
 \end{loglogaxis}
 \end{tikzpicture}
