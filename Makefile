@@ -3,7 +3,6 @@
 # This makefile is based on http://make.paulandlesley.org/autodep.html .
 
 CXX = g++
-MEX = mex
 #CXXFLAGS = -Wall -Wextra -ggdb3 -std=c++11 -pedantic -I../sfft_libs -L../sfft_libs/sfft_eth
 #CXXFLAGS = -Wall -Wextra -ggdb3 -std=c++11 -pedantic -I../sfft_libs -L../sfft_libs/sfft_eth -fsanitize=address -fno-omit-frame-pointer
 CXXFLAGS = -Wall -Wextra -O3 -std=c++11 -pedantic -I../sfft_libs -L../sfft_libs/sfft_eth -L../sfft_libs/sfft_mit
